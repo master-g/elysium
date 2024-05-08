@@ -1,0 +1,20 @@
+[package]
+name = "elysium_game"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+resolver = "2"
+
+[dependencies]
+serde = { workspace = true, features = ["derive"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"] }
+
+[lib]
+name = "elysium_game"
+
+[[bench]]
+name = "bench"
+harness = false
