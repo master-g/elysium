@@ -1,0 +1,19 @@
+extend = [{ path = "Makefile.local.toml" }]
+
+[config]
+skip_core_tasks = true
+time_summary = true
+reduce_output = true
+default_to_workspace = false
+
+[env]
+
+[tasks.empty]
+disabled = true
+private = true
+
+[tasks.init]
+private = true
+
+[tasks.end]
+private = true

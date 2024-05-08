@@ -1,0 +1,17 @@
+[package]
+name = "elysium_core"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+resolver = "2"
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
+targets = []
+
+[dependencies]
+once_cell = { workspace = true }
+tracing = { workspace = true }
+
+[lib]
+name = "elysium_core"

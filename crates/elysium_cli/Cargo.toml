@@ -1,0 +1,12 @@
+[package]
+name = "elysium_cli"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "elysium"
+
+[dependencies]
+clap = "4.5.4"
+
+tokio = { workspace = true, features = ["macros"] }
