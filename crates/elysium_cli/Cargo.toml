@@ -7,6 +7,18 @@ edition = "2021"
 name = "elysium"
 
 [dependencies]
-clap = "4.5.4"
+elysium_core = { path = "../elysium_core" }
 
-tokio = { workspace = true, features = ["macros"] }
+thiserror = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+clap = { version = "4.5.4", features = [
+	"derive",
+	"env",
+	"wrap_help",
+	"unicode",
+] }
+tracing = "0.1.40"
+tracing-appender = "0.2.3"
+tracing-log = "0.2.0"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }

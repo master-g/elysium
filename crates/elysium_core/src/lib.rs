@@ -8,3 +8,4 @@ mod macros;
 
 pub mod cst;
 pub mod env;
+pub mod err;
