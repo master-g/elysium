@@ -4,7 +4,7 @@ use elysium_game::okey_mahjong::*;
 pub fn criterion_benchmark(c: &mut Criterion) {
 	let mut group = c.benchmark_group("okey_is_seven_pairs");
 
-	group.bench_function("Bench 0 joker, and true", |b| {
+	group.bench_function("Bench true, 0 joker", |b| {
 		b.iter(|| {
 			okey_is_seven_pairs(black_box(&[
 				Tile::Black06,
@@ -25,7 +25,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 		});
 	});
 
-	group.bench_function("Bench 0 joker, and false", |b| {
+	group.bench_function("Bench false, 0 joker", |b| {
 		b.iter(|| {
 			okey_is_seven_pairs(black_box(&[
 				Tile::Black13,
@@ -46,7 +46,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 		});
 	});
 
-	group.bench_function("Bench 1 joker", |b| {
+	group.bench_function("Bench true, 1 joker", |b| {
 		b.iter(|| {
 			okey_is_seven_pairs(black_box(&[
 				Tile::Yellow01,
@@ -67,7 +67,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 		});
 	});
 
-	group.bench_function("Bench 2 jokers", |b| {
+	group.bench_function("Bench true, 2 jokers", |b| {
 		b.iter(|| {
 			okey_is_seven_pairs(black_box(&[
 				Tile::Yellow01,
@@ -80,6 +80,48 @@ pub fn criterion_benchmark(c: &mut Criterion) {
 				Tile::Blue04,
 				Tile::Yellow05,
 				Tile::Yellow05,
+				Tile::Joker,
+				Tile::Black06,
+				Tile::Black07,
+				Tile::Joker,
+			]));
+		});
+	});
+
+	group.bench_function("Bench false, 1 joker", |b| {
+		b.iter(|| {
+			okey_is_seven_pairs(black_box(&[
+				Tile::Yellow01,
+				Tile::Yellow01,
+				Tile::Red02,
+				Tile::Red03,
+				Tile::Yellow03,
+				Tile::Yellow03,
+				Tile::Blue07,
+				Tile::Blue13,
+				Tile::Yellow05,
+				Tile::Yellow05,
+				Tile::Black06,
+				Tile::Black06,
+				Tile::Black07,
+				Tile::Joker,
+			]));
+		});
+	});
+
+	group.bench_function("Bench false, 2 jokers", |b| {
+		b.iter(|| {
+			okey_is_seven_pairs(black_box(&[
+				Tile::Yellow01,
+				Tile::Yellow01,
+				Tile::Red02,
+				Tile::Red11,
+				Tile::Yellow03,
+				Tile::Yellow03,
+				Tile::Blue13,
+				Tile::Blue04,
+				Tile::Yellow05,
+				Tile::Yellow12,
 				Tile::Joker,
 				Tile::Black06,
 				Tile::Black07,
