@@ -103,6 +103,63 @@ pub fn okey_is_run(tiles: &[Tile]) -> bool {
 	check_bits(p_bits, num_of_jokers)
 }
 
+#[inline]
+pub fn okey_is_win(tiles: &[Tile]) -> bool {
+	if tiles.len() != 14 {
+		return false;
+	}
+
+	if okey_is_seven_pairs(tiles) {
+		return true;
+	}
+
+	false
+}
+
+#[inline]
+fn check_sets_and_runs(tiles: &[Tile]) -> bool {
+	debug_assert!(tiles.len() == 14); // comment out in release
+
+	let full_mask = 16384; // 1 << 14
+	let mut dp = vec![false; full_mask + 1];
+	dp[0] = true;
+
+	// iterate over all possible masks
+	for mask in 0..=full_mask {
+		if !dp[mask] {
+			continue;
+		}
+
+		// try adding a new set or run
+		for i in 0..14 {
+			if mask & (1 << i) != 0 {
+				// Tile i is already used
+				continue;
+			}
+
+			// try to generate a set
+			for j in (i + 1)..14 {
+				if mask & (1 << j) != 0 {
+					// Tile j is already used
+					continue;
+				}
+
+				// try to generate a run
+				for k in (j + 1)..14 {
+					if mask & (1 << k) != 0 {
+						// Tile k is already used
+						continue;
+					}
+
+					let potential_set = [tiles[i], tiles[j], tiles[k]];
+				}
+			}
+		}
+	}
+
+	dp[full_mask]
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;
