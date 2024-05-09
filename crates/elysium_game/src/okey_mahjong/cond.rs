@@ -143,15 +143,63 @@ fn check_sets_and_runs(tiles: &[Tile]) -> bool {
 					// Tile j is already used
 					continue;
 				}
-
-				// try to generate a run
 				for k in (j + 1)..14 {
 					if mask & (1 << k) != 0 {
 						// Tile k is already used
 						continue;
 					}
 
-					let potential_set = [tiles[i], tiles[j], tiles[k]];
+					// try to generate a set of length 3
+					let potential_set_3 = [tiles[i], tiles[j], tiles[k]];
+					if okey_is_set(&potential_set_3) {
+						let new_mask_3 = mask | (1 << i) | (1 << j) | (1 << k);
+						dp[new_mask_3] = true;
+						if new_mask_3 == full_mask {
+							return true;
+						}
+					}
+
+					// try to generate a set of length 4
+					for l in (k + 1)..14 {
+						if mask & (1 << l) != 0 {
+							// Tile l is already used
+							continue;
+						}
+
+						let potential_set_4 = [tiles[i], tiles[j], tiles[k], tiles[l]];
+						if okey_is_run(&potential_set_4) {
+							let new_mask_4 = mask | (1 << i) | (1 << j) | (1 << k) | (1 << l);
+							dp[new_mask_4] = true;
+							if new_mask_4 == full_mask {
+								return true;
+							}
+						}
+					}
+				}
+			}
+
+			// try to generate a run
+			for len in 3..=(14 - 1) {
+				let end = i + len - 1;
+				if end >= 14 || mask & (1 << end) != 0 {
+					// Tile end is already used
+					continue;
+				}
+				let mut new_mask = mask;
+				let mut valid_run = true;
+				for m in i..=end {
+					if mask & (1 << m) != 0 {
+						// Tile m is already used
+						valid_run = false;
+						break;
+					}
+					new_mask |= 1 << m;
+				}
+				if valid_run && okey_is_run(&tiles[i..=end]) {
+					dp[new_mask] = true;
+					if new_mask == full_mask {
+						return true;
+					}
 				}
 			}
 		}
