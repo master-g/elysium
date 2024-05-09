@@ -1,5 +1,3 @@
-use serde::Serialize;
-
 /// A tile in the Okey Mahjong game.
 ///
 /// bits layout:
@@ -11,7 +9,7 @@ use serde::Serialize;
 /// c: color (1-4)
 /// b: bit (0-1)
 ///
-#[derive(Serialize, Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub enum Tile {
 	Red01 = 0b00000000_00000001_00010001,
 	Red02 = 0b00000000_00000010_00010010,
@@ -70,11 +68,11 @@ pub enum Tile {
 
 impl Tile {
 	pub fn color(&self) -> usize {
-		(*self as usize) >> 8 & 0b00000000_00000000_11110000
+		(*self as usize) >> 4 & 0b00000000_00000000_00001111
 	}
 
 	pub fn rank(&self) -> usize {
-		(*self as usize) >> 4 & 0b00000000_00000000_00001111
+		(*self as usize) & 0b00000000_00000000_00001111
 	}
 
 	pub fn value_without_bits(&self) -> usize {
@@ -82,7 +80,7 @@ impl Tile {
 	}
 
 	pub fn bit(&self) -> usize {
-		(*self as usize) & 0b11111111_11111111_11110000
+		(*self as usize) >> 8 & 0b00000000_00011111_11111111
 	}
 }
 
