@@ -47,11 +47,6 @@ pub fn okey_tiles_from_str(s: &str) -> Vec<Tile> {
 			continue;
 		}
 
-		if c.is_whitespace() {
-			// Whitespace
-			continue;
-		}
-
 		let color = match c.to_ascii_lowercase() {
 			'y' => {
 				// Yellow
@@ -74,7 +69,6 @@ pub fn okey_tiles_from_str(s: &str) -> Vec<Tile> {
 				Color::Joker
 			}
 			_ => {
-				error!("Invalid color: {}", c);
 				continue;
 			}
 		};
