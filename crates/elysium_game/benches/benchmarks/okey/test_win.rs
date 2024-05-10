@@ -57,6 +57,12 @@ pub fn benchmark(c: &mut Criterion) {
 			okey_check_win(black_box(&vec7));
 		});
 	});
+	let vec8 = okey_tiles_from_str("y1 y2 y3 y9 y10 y11 r1 b1 k1 y1 r12 b12 k12 y12");
+	group.bench_function("Bench win, 1 set, 1 run", |b| {
+		b.iter(|| {
+			okey_check_win(black_box(&vec8));
+		});
+	});
 }
 
 criterion_group!(benches, benchmark);

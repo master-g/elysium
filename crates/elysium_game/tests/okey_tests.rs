@@ -244,4 +244,10 @@ mod tests {
 		vec6.shuffle(&mut rnd);
 		assert!(!okey_check_win(&vec6));
 	}
+
+	#[test]
+	fn test_okey_check_win_fixme() {
+		let vec7 = okey_tiles_from_str("y1 y2 y3 y9 y10 y11 r1 b1 k1 y1 r12 b12 k12 y12");
+		assert!(okey_check_win(&vec7), "shit happens");
+	}
 }

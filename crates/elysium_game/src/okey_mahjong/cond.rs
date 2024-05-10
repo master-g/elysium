@@ -143,7 +143,7 @@ pub fn okey_check_win(tiles: &[Tile]) -> bool {
 
 	// let sorted = tiles.to_vec();
 
-	try_to_win(sorted)
+	try_to_win_2(sorted)
 }
 
 struct SearchNode {
@@ -171,6 +171,7 @@ fn try_to_win(tiles: Vec<Tile>) -> bool {
 		}
 
 		let n = current_node.free.len();
+		assert!(n > 0, "Free tiles should not be empty");
 		for start in 0..n {
 			for size in 3..=4 {
 				if start + size > n {
@@ -203,4 +204,33 @@ fn try_to_win(tiles: Vec<Tile>) -> bool {
 	}
 
 	false
+}
+
+fn try_to_win_2(tiles: Vec<Tile>) -> bool {
+	let n = tiles.len();
+	let mut dp = vec![false; 1 << n];
+
+	dp[0] = true;
+	for mask in 0..1 << n {
+		if !dp[mask] {
+			continue;
+		}
+		// iterate all possible subsets
+		for submask in 1..1 << n {
+			if (mask & submask) != 0 {
+				continue;
+			}
+			let subset: Vec<Tile> = tiles
+				.iter()
+				.enumerate()
+				.filter(|&(i, _)| (submask >> i) & 1 == 1)
+				.map(|(_, &tile)| tile)
+				.collect();
+			if okey_is_set(&subset) || okey_is_run(&subset) {
+				dp[mask | submask] = true;
+			}
+		}
+	}
+
+	dp[(1 << n) - 1]
 }
