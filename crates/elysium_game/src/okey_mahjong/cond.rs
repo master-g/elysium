@@ -12,12 +12,30 @@ pub fn okey_is_seven_pairs(tiles: &[Tile]) -> bool {
 	let mut jokers = counts[Tile::Joker.value_without_bits()];
 
 	for count in counts.iter().take(255) {
-		if *count >= 2 {
-			pair_count += 1;
-		} else if *count == 1 && jokers > 0 {
-			pair_count += 1;
-			jokers -= 1;
+		match *count {
+			0 => continue,
+			1 => {
+				if jokers > 0 {
+					jokers -= 1;
+					pair_count += 1;
+				} else {
+					return false;
+				}
+			}
+			2 => pair_count += 1,
+			_ => {
+				error!("Invalid count: {}", count);
+				return false;
+			}
 		}
+	}
+
+	if jokers == 2 {
+		// If there are two jokers, they can be used as a pair
+		pair_count += 1;
+	} else if jokers == 1 {
+		error!("Invalid joker count: {}", jokers);
+		return false;
 	}
 
 	pair_count == 7
@@ -113,7 +131,17 @@ pub fn okey_is_win(tiles: &[Tile]) -> bool {
 		return true;
 	}
 
-	false
+	let sorted = {
+		let mut sorted = tiles.to_vec();
+		sorted.sort_by(|a, b| {
+			let a = a.value_without_bits();
+			let b = b.value_without_bits();
+			a.cmp(&b)
+		});
+		sorted
+	};
+
+	try_to_win(sorted)
 }
 
 #[inline]
@@ -208,6 +236,65 @@ fn check_sets_and_runs(tiles: &[Tile]) -> bool {
 	dp[full_mask]
 }
 
+struct SearchNode {
+	sets: Vec<Vec<Tile>>,
+	runs: Vec<Vec<Tile>>,
+	free: Vec<Tile>,
+}
+
+impl SearchNode {
+	fn new(free: Vec<Tile>) -> Self {
+		Self {
+			sets: Vec::new(),
+			runs: Vec::new(),
+			free,
+		}
+	}
+}
+
+fn try_to_win(mut free_tiles: Vec<Tile>) -> bool {
+	let mut stack: Vec<SearchNode> = vec![SearchNode::new(free_tiles)];
+
+	while let Some(current_node) = stack.pop() {
+		if current_node.free.is_empty() {
+			return true;
+		}
+
+		let n = current_node.free.len();
+		for start in 0..n {
+			for size in 3..=4 {
+				if start + size > n {
+					break;
+				}
+				let slice = &current_node.free[start..(start + size)];
+				if okey_is_set(slice) {
+					let mut new_free = current_node.free.clone();
+					new_free.drain(start..(start + size));
+					let mut new_node = SearchNode::new(new_free);
+					new_node.sets.push(slice.to_vec());
+					stack.push(new_node);
+				}
+			}
+
+			for size in 3..=n - start {
+				if start + size > n {
+					break;
+				}
+				let slice = &current_node.free[start..(start + size)];
+				if okey_is_run(slice) {
+					let mut new_free = current_node.free.clone();
+					new_free.drain(start..(start + size));
+					let mut new_node = SearchNode::new(new_free);
+					new_node.runs.push(slice.to_vec());
+					stack.push(new_node);
+				}
+			}
+		}
+	}
+
+	false
+}
+
 #[cfg(test)]
 mod tests {
 	use super::*;
@@ -215,87 +302,100 @@ mod tests {
 
 	#[test]
 	fn test_okey_is_seven_pairs() {
-		let vectors = vec![
-			(
-				vec![
-					Tile::Yellow01,
-					Tile::Yellow01,
-					Tile::Yellow02,
-					Tile::Yellow02,
-					Tile::Yellow03,
-					Tile::Yellow03,
-					Tile::Yellow04,
-					Tile::Yellow04,
-					Tile::Yellow05,
-					Tile::Yellow05,
-					Tile::Yellow06,
-					Tile::Yellow06,
-					Tile::Yellow07,
-					Tile::Yellow07,
-				],
-				true,
-			),
-			(
-				vec![
-					Tile::Yellow01,
-					Tile::Yellow01,
-					Tile::Yellow02,
-					Tile::Yellow02,
-					Tile::Yellow03,
-					Tile::Yellow03,
-					Tile::Yellow04,
-					Tile::Yellow04,
-					Tile::Yellow05,
-					Tile::Yellow05,
-					Tile::Yellow06,
-					Tile::Yellow06,
-					Tile::Yellow07,
-					Tile::Joker,
-				],
-				true,
-			),
-			(
-				vec![
-					Tile::Yellow01,
-					Tile::Yellow01,
-					Tile::Yellow02,
-					Tile::Yellow02,
-					Tile::Yellow03,
-					Tile::Yellow03,
-					Tile::Yellow04,
-					Tile::Yellow04,
-					Tile::Yellow05,
-					Tile::Yellow05,
-					Tile::Yellow06,
-					Tile::Yellow07,
-					Tile::Joker,
-					Tile::Joker,
-				],
-				true,
-			),
-			(
-				vec![
-					Tile::Yellow01,
-					Tile::Yellow01,
-					Tile::Yellow02,
-					Tile::Yellow02,
-					Tile::Yellow03,
-					Tile::Yellow03,
-					Tile::Yellow04,
-					Tile::Yellow04,
-					Tile::Yellow05,
-					Tile::Yellow05,
-					Tile::Yellow06,
-					Tile::Yellow07,
-					Tile::Yellow08,
-				],
-				false,
-			),
-		];
-
-		for (tiles, expected) in vectors {
-			assert_eq!(okey_is_seven_pairs(&tiles), expected);
-		}
+		assert!(okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow06,
+			Tile::Joker,
+			Tile::Joker,
+		]));
+		assert!(okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow06,
+			Tile::Yellow07,
+			Tile::Yellow07,
+		]));
+		assert!(okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow06,
+			Tile::Yellow07,
+			Tile::Joker,
+		]));
+		assert!(okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow07,
+			Tile::Joker,
+			Tile::Joker,
+		]));
+		assert!(!okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow07,
+			Tile::Yellow08,
+		]));
+		assert!(!okey_is_seven_pairs(&[
+			Tile::Yellow01,
+			Tile::Yellow01,
+			Tile::Yellow02,
+			Tile::Yellow02,
+			Tile::Yellow03,
+			Tile::Yellow03,
+			Tile::Yellow04,
+			Tile::Yellow04,
+			Tile::Yellow05,
+			Tile::Yellow05,
+			Tile::Yellow06,
+			Tile::Yellow07,
+			Tile::Yellow08,
+		]));
 	}
 
 	#[test]
@@ -410,6 +510,75 @@ mod tests {
 			Tile::Blue11,
 			Tile::Blue12,
 			Tile::Blue13,
+		]));
+		assert!(okey_is_run(&[Tile::Black12, Tile::Black13, Tile::Joker,]));
+	}
+
+	#[test]
+	fn test_okey_is_win() {
+		assert!(okey_is_win(&[
+			Tile::Black01,
+			Tile::Black02,
+			Tile::Black03,
+			Tile::Black04,
+			Tile::Black05,
+			Tile::Black06,
+			Tile::Black07,
+			Tile::Black08,
+			Tile::Black09,
+			Tile::Black10,
+			Tile::Black11,
+			Tile::Black12,
+			Tile::Black13,
+			Tile::Joker,
+		]));
+		assert!(okey_is_win(&[
+			Tile::Black01,
+			Tile::Black01,
+			Tile::Black02,
+			Tile::Black02,
+			Tile::Black03,
+			Tile::Black03,
+			Tile::Black04,
+			Tile::Black04,
+			Tile::Black05,
+			Tile::Black05,
+			Tile::Black06,
+			Tile::Black06,
+			Tile::Black07,
+			Tile::Black07,
+		]));
+		assert!(okey_is_win(&[
+			Tile::Black01,
+			Tile::Black01,
+			Tile::Black02,
+			Tile::Black02,
+			Tile::Black03,
+			Tile::Black03,
+			Tile::Black04,
+			Tile::Black04,
+			Tile::Black05,
+			Tile::Black05,
+			Tile::Black06,
+			Tile::Black06,
+			Tile::Black07,
+			Tile::Joker,
+		]));
+		assert!(okey_is_win(&[
+			Tile::Black01,
+			Tile::Black01,
+			Tile::Black02,
+			Tile::Black02,
+			Tile::Black03,
+			Tile::Black03,
+			Tile::Black04,
+			Tile::Black04,
+			Tile::Black05,
+			Tile::Black05,
+			Tile::Black06,
+			Tile::Black06,
+			Tile::Joker,
+			Tile::Joker,
 		]));
 	}
 }

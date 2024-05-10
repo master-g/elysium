@@ -66,6 +66,32 @@ pub enum Tile {
 	Joker = 0b00011111_11111111_11111111,
 }
 
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Color {
+	Red,
+	Yellow,
+	Blue,
+	Black,
+	Joker,
+}
+
+#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+pub enum Rank {
+	One,
+	Two,
+	Three,
+	Four,
+	Five,
+	Six,
+	Seven,
+	Eight,
+	Nine,
+	Ten,
+	Eleven,
+	Twelve,
+	Thirteen,
+}
+
 impl Tile {
 	pub fn color(&self) -> usize {
 		(*self as usize) >> 4 & 0b00000000_00000000_00001111
@@ -81,6 +107,33 @@ impl Tile {
 
 	pub fn bit(&self) -> usize {
 		(*self as usize) >> 8 & 0b00000000_00011111_11111111
+	}
+
+	pub fn new(color: Color, rank: Rank) -> Tile {
+		let color_bits = match color {
+			Color::Red => 0b00000000_00000000_00010000,
+			Color::Yellow => 0b00000000_00000000_00100000,
+			Color::Blue => 0b00000000_00000000_01000000,
+			Color::Black => 0b00000000_00000000_10000000,
+			Color::Joker => 0b00011111_11111111_11111111,
+		};
+		let other_bits = match rank {
+			Rank::One => 0b00000000_00000001_00000001,
+			Rank::Two => 0b00000000_00000010_00000010,
+			Rank::Three => 0b00000000_00000100_00000011,
+			Rank::Four => 0b00000000_00001000_00000100,
+			Rank::Five => 0b00000000_00010000_00000101,
+			Rank::Six => 0b00000000_00100000_00000110,
+			Rank::Seven => 0b00000000_01000000_00000111,
+			Rank::Eight => 0b00000000_10000000_00001000,
+			Rank::Nine => 0b00000001_00000000_00001001,
+			Rank::Ten => 0b00000010_00000000_00001010,
+			Rank::Eleven => 0b00000100_00000000_00001011,
+			Rank::Twelve => 0b00001000_00000000_00001100,
+			Rank::Thirteen => 0b00010000_00000000_00001101,
+		};
+
+		Tile::try_from(color_bits | other_bits).unwrap()
 	}
 }
 
