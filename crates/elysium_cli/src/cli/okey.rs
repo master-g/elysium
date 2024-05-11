@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 use elysium_game::okey_mahjong::{okey_check_win, okey_tiles_from_str};
 
 use crate::err::Error;
@@ -15,9 +17,11 @@ pub(super) async fn init() -> Result<(), Error> {
 				if tiles.is_empty() {
 					continue;
 				}
+				let start = Instant::now();
 				let win = okey_check_win(&tiles);
+				let duration = start.elapsed();
 				assert!(win, "{} should be winnable", line);
-				println!("{} ✅", line);
+				println!("{} ✅ cost={:?}", line, duration);
 			}
 			Err(e) => eprintln!("Error reading line: {}", e),
 		}

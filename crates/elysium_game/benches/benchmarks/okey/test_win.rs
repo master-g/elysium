@@ -4,12 +4,6 @@ use elysium_game::okey_mahjong::*;
 pub fn benchmark(c: &mut Criterion) {
 	let mut group = c.benchmark_group("okey_check_win");
 
-	// assert!(okey_check_win(&okey_tiles_from_str("b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 b13 j")));
-	// assert!(okey_check_win(&okey_tiles_from_str("b1 b1 r2 r2 y5 y5 b6 b6 b7 b7 b8 b8 k9 k9")));
-	// assert!(okey_check_win(&okey_tiles_from_str("b1 b1 b2 b2 k3 k3 k4 k4 r5 r5 y6 y6 k7 j")));
-	// assert!(okey_check_win(&okey_tiles_from_str("b1 b1 b2 b2 k3 k3 k4 k4 r5 r5 y6 y6 j j")));
-	// assert!(okey_check_win(&okey_tiles_from_str("r1 y1 b1 k1 k2 k3 r1 r2 r3 r4 r5 r6 r7 r8")));
-
 	let vec1 = okey_tiles_from_str("b1 b2 b3 b4 b5 b6 b7 b8 b9 b10 b11 b12 b13 j");
 	group.bench_function("Bench win, 13 run with 1 joker", |b| {
 		b.iter(|| {
@@ -61,6 +55,13 @@ pub fn benchmark(c: &mut Criterion) {
 	group.bench_function("Bench win, 1 set, 1 run", |b| {
 		b.iter(|| {
 			okey_check_win(black_box(&vec8));
+		});
+	});
+
+	let vec9 = okey_tiles_from_str("y6 r12 y7 y1 k1 r1 j y2 y9 k4 k1 k2 k3 j");
+	group.bench_function("Bench, evil", |b| {
+		b.iter(|| {
+			okey_check_win(black_box(&vec9));
 		});
 	});
 }

@@ -308,6 +308,7 @@ dependencies = [
  "elysium_game",
  "jemallocator",
  "mimalloc",
+ "rand",
  "semver",
  "thiserror",
  "tokio",

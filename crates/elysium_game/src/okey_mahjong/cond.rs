@@ -58,18 +58,27 @@ pub fn okey_is_set(tiles: &[Tile]) -> bool {
 #[inline]
 fn is_set_fast(tiles: &[Tile]) -> bool {
 	let origin_len = tiles.len();
-	let filtered = tiles.iter().filter(|t| t != &&Tile::Joker).collect::<Vec<_>>();
-	let num_of_jokers = origin_len - filtered.len();
+	let mut color_bits = 0;
+	let mut rank = None;
+	let mut num_of_jokers = 0;
 
-	// Check if all tiles are the same rank, or if there are jokers
-	if filtered.iter().any(|t| t.rank() != filtered[0].rank()) {
-		return false;
+	for &tile in tiles {
+		if tile == Tile::Joker {
+			num_of_jokers += 1;
+		} else {
+			if let Some(r) = rank {
+				if r != tile.rank() {
+					return false;
+				}
+			} else {
+				rank = Some(tile.rank());
+			}
+			color_bits |= tile.color();
+		}
 	}
 
-	// Check if there are origin_len - num_of_jokers colors
-	let color_bits = filtered.iter().fold(0, |acc, &t| t.color() | acc);
-
-	color_bits.count_ones() == (origin_len - num_of_jokers) as u32
+	let needed_colors = origin_len - num_of_jokers;
+	color_bits.count_ones() == needed_colors as u32
 }
 
 pub fn okey_is_run(tiles: &[Tile]) -> bool {
