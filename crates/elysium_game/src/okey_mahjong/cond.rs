@@ -24,7 +24,7 @@ pub fn okey_is_seven_pairs(tiles: &[Tile]) -> bool {
 			}
 			2 => pair_count += 1,
 			_ => {
-				error!("Invalid count: {}", count);
+				error!("impossible count of {}, {:?}", count, tiles);
 				return false;
 			}
 		}
@@ -87,20 +87,12 @@ pub fn okey_is_run(tiles: &[Tile]) -> bool {
 	// these bits should be consecutive
 	let is_continuous = |bits: usize, max_gaps: usize| -> bool {
 		// remove trailing zeros
-		let mut bits = bits >> bits.trailing_zeros();
+		let bits = bits >> bits.trailing_zeros();
 
 		// count num of gaps
 		let gaps = (bits.count_zeros() - bits.leading_zeros()) as usize;
 
-		if gaps > max_gaps {
-			return false;
-		}
-
-		while bits & (bits >> 1) != 0 {
-			bits &= bits >> 1;
-		}
-
-		bits.count_ones() == 1
+		gaps <= max_gaps
 	};
 
 	let check_bits = |bits: usize, jokers: usize| -> bool {
@@ -131,82 +123,10 @@ pub fn okey_check_win(tiles: &[Tile]) -> bool {
 		return true;
 	}
 
-	let sorted = {
-		let mut sorted = tiles.to_vec();
-		sorted.sort_by(|a, b| {
-			let a = a.value_without_bits();
-			let b = b.value_without_bits();
-			a.cmp(&b)
-		});
-		sorted
-	};
-
-	// let sorted = tiles.to_vec();
-
-	try_to_win_2(sorted)
+	try_to_win(tiles)
 }
 
-struct SearchNode {
-	sets: Vec<Vec<Tile>>,
-	runs: Vec<Vec<Tile>>,
-	free: Vec<Tile>,
-}
-
-impl SearchNode {
-	fn new(free: Vec<Tile>) -> Self {
-		Self {
-			sets: Vec::new(),
-			runs: Vec::new(),
-			free,
-		}
-	}
-}
-
-fn try_to_win(tiles: Vec<Tile>) -> bool {
-	let mut stack: Vec<SearchNode> = vec![SearchNode::new(tiles)];
-
-	while let Some(current_node) = stack.pop() {
-		if current_node.free.is_empty() {
-			return true;
-		}
-
-		let n = current_node.free.len();
-		assert!(n > 0, "Free tiles should not be empty");
-		for start in 0..n {
-			for size in 3..=4 {
-				if start + size > n {
-					break;
-				}
-				let slice = &current_node.free[start..(start + size)];
-				if okey_is_set(slice) {
-					let mut new_free = current_node.free.clone();
-					new_free.drain(start..(start + size));
-					let mut new_node = SearchNode::new(new_free);
-					new_node.sets.push(slice.to_vec());
-					stack.push(new_node);
-				}
-			}
-
-			for size in 3..=n - start {
-				if start + size > n {
-					break;
-				}
-				let slice = &current_node.free[start..(start + size)];
-				if okey_is_run(slice) {
-					let mut new_free = current_node.free.clone();
-					new_free.drain(start..(start + size));
-					let mut new_node = SearchNode::new(new_free);
-					new_node.runs.push(slice.to_vec());
-					stack.push(new_node);
-				}
-			}
-		}
-	}
-
-	false
-}
-
-fn try_to_win_2(tiles: Vec<Tile>) -> bool {
+fn try_to_win(tiles: &[Tile]) -> bool {
 	let n = tiles.len();
 	let mut dp = vec![false; 1 << n];
 
@@ -226,7 +146,12 @@ fn try_to_win_2(tiles: Vec<Tile>) -> bool {
 				.filter(|&(i, _)| (submask >> i) & 1 == 1)
 				.map(|(_, &tile)| tile)
 				.collect();
+			if subset.len() < 3 {
+				continue;
+			}
+			// trace!("testing {}", okey_tiles_to_string(&subset));
 			if okey_is_set(&subset) || okey_is_run(&subset) {
+				// trace!("{} is a run or set", okey_tiles_to_string(&subset));
 				dp[mask | submask] = true;
 			}
 		}

@@ -1,4 +1,5 @@
 mod foo;
+mod okey;
 mod version;
 
 use std::process::ExitCode;
@@ -42,6 +43,8 @@ struct Cli {
 enum Commands {
 	#[command(about = "Test command")]
 	Foo(foo::FooCommandArguments),
+	#[command(about = "Okey mahjong command")]
+	Okey,
 	#[command(about = "Print version information")]
 	Version,
 }
@@ -71,6 +74,7 @@ pub async fn init() -> ExitCode {
 
 	let output = match args.command {
 		Some(Commands::Foo(args)) => foo::init(args).await,
+		Some(Commands::Okey) => okey::init().await,
 		_ => Ok(()),
 	};
 

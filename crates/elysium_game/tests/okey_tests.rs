@@ -129,8 +129,9 @@ mod tests {
 		]));
 	}
 
-	#[test]
+	#[test_log::test]
 	fn test_okey_is_run() {
+		assert!(okey_is_run(&[Tile::Red07, Tile::Joker, Tile::Red09]));
 		assert!(okey_is_run(&[Tile::Yellow01, Tile::Yellow12, Tile::Yellow13,]));
 		assert!(okey_is_run(&[
 			Tile::Yellow01,
@@ -243,11 +244,23 @@ mod tests {
 		let mut vec6 = okey_tiles_from_str("r1 r1 r5 r3 r2 b9 b8 b2 b3 y7 y5 y13 k8 k4");
 		vec6.shuffle(&mut rnd);
 		assert!(!okey_check_win(&vec6));
+
+		let mut vec7 = okey_tiles_from_str("y6 y7 y8 r5 b5 j k5 r8 b8 k8 r13 b13 k13 y13");
+		vec7.shuffle(&mut rnd);
+		assert!(okey_check_win(&vec7));
+
+		let mut vec = okey_tiles_from_str("y1 y2 y3 y9 y10 y11 r1 b1 k1 y1 r12 b12 k12 y12");
+		vec.shuffle(&mut rnd);
+		assert!(okey_check_win(&vec));
+
+		let mut vec = okey_tiles_from_str("r7 j r9 b5 b6 b7 r3 b3 k3 y3 r11 b11 k11 y11");
+		vec.shuffle(&mut rnd);
+		assert!(okey_check_win(&vec));
 	}
 
-	#[test]
+	#[test_log::test]
 	fn test_okey_check_win_fixme() {
-		let vec7 = okey_tiles_from_str("y1 y2 y3 y9 y10 y11 r1 b1 k1 y1 r12 b12 k12 y12");
-		assert!(okey_check_win(&vec7), "shit happens");
+		let vec = okey_tiles_from_str("r4 j k7 k7 r9 r9 k2 k2 r4 j b12 b12 k13 k13");
+		assert!(okey_check_win(&vec), "shit happens");
 	}
 }

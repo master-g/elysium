@@ -26,7 +26,7 @@ pub fn okey_tiles_from_str(s: &str) -> Vec<Tile> {
 					12 => Rank::Twelve,
 					13 => Rank::Thirteen,
 					_ => {
-						error!("Invalid rank: {}", d);
+						error!("{} contains invalid rank: {}", s, d);
 						return;
 					}
 				};
@@ -83,13 +83,17 @@ pub fn okey_tiles_from_str(s: &str) -> Vec<Tile> {
 	parse_digits(&mut digits, &mut ranks);
 
 	if colors.len() != ranks.len() {
-		error!("Colors and ranks have different lengths, {:?}, {:?}", colors, ranks);
+		error!("{} has different length of colors and ranks, {:?}, {:?}", s, colors, ranks);
 		return Vec::new();
 	}
 
 	trace!("colors: {:?}", colors);
 	trace!("ranks:  {:?}", ranks);
 	colors.into_iter().zip(ranks).map(|(color, rank)| Tile::new(color, rank)).collect()
+}
+
+pub fn okey_tiles_to_string(tiles: &[Tile]) -> String {
+	tiles.iter().map(|t| t.to_string()).collect::<Vec<_>>().join(" ")
 }
 
 #[cfg(test)]

@@ -305,6 +305,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "elysium_core",
+ "elysium_game",
  "jemallocator",
  "mimalloc",
  "semver",

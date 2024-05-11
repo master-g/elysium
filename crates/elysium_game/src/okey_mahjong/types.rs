@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 /// A tile in the Okey Mahjong game.
 ///
 /// bits layout:
@@ -203,5 +205,38 @@ impl TryFrom<usize> for Tile {
 			0b00011111_11111111_11111111 => Ok(Tile::Joker),
 			_ => Err("Invalid tile"),
 		}
+	}
+}
+
+impl Display for Tile {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		let color = match self.color() {
+			0b1111 => {
+				return f.write_str("j");
+			}
+			0b0001 => "r",
+			0b0010 => "y",
+			0b0100 => "b",
+			0b1000 => "k",
+			_ => "n/a",
+		};
+
+		let value = match self.rank() {
+			1 => "1",
+			2 => "2",
+			3 => "3",
+			4 => "4",
+			5 => "5",
+			6 => "6",
+			7 => "7",
+			8 => "8",
+			9 => "9",
+			10 => "10",
+			11 => "11",
+			12 => "12",
+			13 => "13",
+			_ => "",
+		};
+		f.write_str(&format!("{}{}", color, value))
 	}
 }
