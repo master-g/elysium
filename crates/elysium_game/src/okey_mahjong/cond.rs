@@ -1,3 +1,5 @@
+use crate::okey_mahjong::okey_tiles_to_string;
+
 use super::Tile;
 
 #[inline]
@@ -149,9 +151,8 @@ fn try_to_win(tiles: &[Tile]) -> bool {
 			if subset.len() < 3 {
 				continue;
 			}
-			// trace!("testing {}", okey_tiles_to_string(&subset));
+			// println!("testing {}", okey_tiles_to_string(&subset));
 			if okey_is_set(&subset) || okey_is_run(&subset) {
-				// trace!("{} is a run or set", okey_tiles_to_string(&subset));
 				dp[mask | submask] = true;
 			}
 		}

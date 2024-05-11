@@ -260,7 +260,7 @@ mod tests {
 
 	#[test_log::test]
 	fn test_okey_check_win_fixme() {
-		let vec = okey_tiles_from_str("r4 j k7 k7 r9 r9 k2 k2 r4 j b12 b12 k13 k13");
+		let vec = okey_tiles_from_str("b1 b2 b3 r1 k1 y1 r3 k3 y3 r13 b13 k13 j y13");
 		assert!(okey_check_win(&vec), "shit happens");
 	}
 }
