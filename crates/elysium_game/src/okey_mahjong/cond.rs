@@ -1,3 +1,5 @@
+use core::num;
+
 use crate::okey_mahjong::okey_tiles_to_string;
 
 use super::Tile;
@@ -43,7 +45,6 @@ pub fn okey_is_seven_pairs(tiles: &[Tile]) -> bool {
 	pair_count == 7
 }
 
-#[inline]
 pub fn okey_is_set(tiles: &[Tile]) -> bool {
 	// check length
 	let origin_len = tiles.len();
@@ -51,6 +52,12 @@ pub fn okey_is_set(tiles: &[Tile]) -> bool {
 		return false;
 	}
 
+	is_set_fast(tiles)
+}
+
+#[inline]
+fn is_set_fast(tiles: &[Tile]) -> bool {
+	let origin_len = tiles.len();
 	let filtered = tiles.iter().filter(|t| t != &&Tile::Joker).collect::<Vec<_>>();
 	let num_of_jokers = origin_len - filtered.len();
 
@@ -65,24 +72,41 @@ pub fn okey_is_set(tiles: &[Tile]) -> bool {
 	color_bits.count_ones() == (origin_len - num_of_jokers) as u32
 }
 
-#[inline]
 pub fn okey_is_run(tiles: &[Tile]) -> bool {
+	// check length
 	let origin_len = tiles.len();
-	if origin_len < 3 {
+	if !(3..=13).contains(&origin_len) {
 		return false;
 	}
 
-	let filtered = tiles.iter().filter(|t| t != &&Tile::Joker).collect::<Vec<_>>();
-	let num_of_jokers = origin_len - filtered.len();
+	is_run_fast(tiles)
+}
 
-	// should only have one color
-	if filtered.iter().any(|t| t.color() != filtered[0].color()) {
-		return false;
+#[inline]
+fn is_run_fast(tiles: &[Tile]) -> bool {
+	let origin_len = tiles.len();
+	let mut p_bits = 0;
+	let mut color = None;
+	let mut num_of_jokers = 0;
+
+	for &tile in tiles {
+		if tile == Tile::Joker {
+			num_of_jokers += 1;
+		} else {
+			if let Some(c) = color {
+				if c != tile.color() {
+					return false;
+				}
+			} else {
+				color = Some(tile.color());
+			}
+			p_bits |= tile.bit();
+		}
 	}
 
-	// should have origin_len - num_of_jokers bits
-	let p_bits = filtered.iter().fold(0, |acc, &t| t.bit() | acc);
-	if p_bits.count_ones() != (origin_len - num_of_jokers) as u32 {
+	let num_needed = origin_len - num_of_jokers;
+	let num_bits = p_bits.count_ones() as usize;
+	if num_bits != num_needed {
 		return false;
 	}
 
@@ -148,7 +172,7 @@ fn try_to_win(tiles: &[Tile]) -> bool {
 				subset[acc] = tiles[i];
 				acc + 1
 			});
-			if okey_is_set(&subset[..subset_len]) || okey_is_run(&subset[..subset_len]) {
+			if is_set_fast(&subset[..subset_len]) || is_run_fast(&subset[..subset_len]) {
 				dp[mask | submask] = true;
 				if mask | submask == big_num - 1 {
 					return true;

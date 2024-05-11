@@ -21,6 +21,18 @@ pub fn benchmark(c: &mut Criterion) {
 			okey_is_set(black_box(&[Tile::Yellow01, Tile::Black01, Tile::Red02, Tile::Joker]));
 		});
 	});
+
+	group.bench_function("Bench false, two jokers", |b| {
+		b.iter(|| {
+			okey_is_set(black_box(&[Tile::Yellow01, Tile::Joker, Tile::Red02, Tile::Joker]));
+		});
+	});
+
+	group.bench_function("Bench true, two jokers", |b| {
+		b.iter(|| {
+			okey_is_set(black_box(&[Tile::Yellow01, Tile::Joker, Tile::Joker]));
+		});
+	});
 }
 
 criterion_group!(benches, benchmark);
