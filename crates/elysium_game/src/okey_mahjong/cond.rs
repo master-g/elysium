@@ -117,15 +117,13 @@ pub fn okey_is_run(tiles: &[Tile]) -> bool {
 
 #[inline]
 pub fn okey_check_win(tiles: &[Tile]) -> bool {
-	if tiles.len() != 14 {
-		return false;
-	}
+	debug_assert!(tiles.len() == 14, "tiles: {} length is not 14", okey_tiles_to_string(tiles));
 
 	if okey_is_seven_pairs(tiles) {
 		return true;
 	}
 
-	try_to_win(tiles)
+	try_to_win_2(tiles)
 }
 
 fn try_to_win(tiles: &[Tile]) -> bool {
@@ -159,4 +157,38 @@ fn try_to_win(tiles: &[Tile]) -> bool {
 	}
 
 	dp[(1 << n) - 1]
+}
+
+fn try_to_win_2(tiles: &[Tile]) -> bool {
+	let big_num = 1 << 14;
+	let mut dp = vec![false; big_num];
+	let mut subset = [Tile::Joker; 14];
+
+	dp[0] = true;
+	for mask in 0..big_num {
+		if !dp[mask] {
+			continue;
+		}
+		// iterate all possible subsets
+		for submask in 1..big_num {
+			if (mask & submask) != 0 {
+				continue;
+			}
+			let subset_len = (0..14).filter(|&i| (submask >> i) & 1 == 1).fold(0, |acc, i| {
+				subset[acc] = tiles[i];
+				acc + 1
+			});
+			if subset_len < 3 {
+				continue;
+			}
+			if okey_is_set(&subset[..subset_len]) || okey_is_run(&subset[..subset_len]) {
+				dp[mask | submask] = true;
+				if mask | submask == big_num - 1 {
+					return true;
+				}
+			}
+		}
+	}
+
+	dp[big_num - 1]
 }
