@@ -123,43 +123,10 @@ pub fn okey_check_win(tiles: &[Tile]) -> bool {
 		return true;
 	}
 
-	try_to_win_2(tiles)
+	try_to_win(tiles)
 }
 
 fn try_to_win(tiles: &[Tile]) -> bool {
-	let n = tiles.len();
-	let mut dp = vec![false; 1 << n];
-
-	dp[0] = true;
-	for mask in 0..1 << n {
-		if !dp[mask] {
-			continue;
-		}
-		// iterate all possible subsets
-		for submask in 1..1 << n {
-			if (mask & submask) != 0 {
-				continue;
-			}
-			let subset: Vec<Tile> = tiles
-				.iter()
-				.enumerate()
-				.filter(|&(i, _)| (submask >> i) & 1 == 1)
-				.map(|(_, &tile)| tile)
-				.collect();
-			if subset.len() < 3 {
-				continue;
-			}
-			// println!("testing {}", okey_tiles_to_string(&subset));
-			if okey_is_set(&subset) || okey_is_run(&subset) {
-				dp[mask | submask] = true;
-			}
-		}
-	}
-
-	dp[(1 << n) - 1]
-}
-
-fn try_to_win_2(tiles: &[Tile]) -> bool {
 	let big_num = 1 << 14;
 	let mut dp = vec![false; big_num];
 	let mut subset = [Tile::Joker; 14];
@@ -174,13 +141,13 @@ fn try_to_win_2(tiles: &[Tile]) -> bool {
 			if (mask & submask) != 0 {
 				continue;
 			}
+			if submask.count_ones() < 3 {
+				continue;
+			}
 			let subset_len = (0..14).filter(|&i| (submask >> i) & 1 == 1).fold(0, |acc, i| {
 				subset[acc] = tiles[i];
 				acc + 1
 			});
-			if subset_len < 3 {
-				continue;
-			}
 			if okey_is_set(&subset[..subset_len]) || okey_is_run(&subset[..subset_len]) {
 				dp[mask | submask] = true;
 				if mask | submask == big_num - 1 {

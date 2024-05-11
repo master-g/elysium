@@ -95,18 +95,22 @@ pub enum Rank {
 }
 
 impl Tile {
+	#[inline]
 	pub fn color(&self) -> usize {
 		(*self as usize) >> 4 & 0b00000000_00000000_00001111
 	}
 
+	#[inline]
 	pub fn rank(&self) -> usize {
 		(*self as usize) & 0b00000000_00000000_00001111
 	}
 
+	#[inline]
 	pub fn value_without_bits(&self) -> usize {
 		(*self as usize) & 0b00000000_00000000_11111111
 	}
 
+	#[inline]
 	pub fn bit(&self) -> usize {
 		(*self as usize) >> 8 & 0b00000000_00011111_11111111
 	}
