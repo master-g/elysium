@@ -1,6 +1,6 @@
 use crate::okey_mahjong::okey_tiles_to_string;
 
-use super::Tile;
+use super::{HandType, Tile};
 
 #[inline]
 pub fn okey_is_seven_pairs(tiles: &[Tile]) -> bool {
@@ -189,4 +189,74 @@ fn try_to_win(tiles: &[Tile]) -> bool {
 	}
 
 	dp[big_num - 1]
+}
+
+pub fn okey_arrange_win(tiles: &[Tile]) -> Option<Vec<HandType>> {
+	if tiles.len() != 14 {
+		return None;
+	}
+
+	if okey_is_seven_pairs(tiles) {
+		let mut result: Vec<HandType> = Vec::new();
+		for tile in tiles {
+			if result.iter().any(|x| {
+				if let HandType::Pair(t) = x {
+					t == tile
+				} else {
+					false
+				}
+			}) {
+				continue;
+			}
+			result.push(HandType::Pair(*tile));
+			result.sort()
+		}
+		return Some(result);
+	}
+
+	if !okey_check_win(tiles) {
+		return None;
+	}
+
+	let big_num = 1 << 14;
+	let mut dp: Vec<Option<Vec<HandType>>> = vec![None; big_num];
+	let mut subset = [Tile::Joker; 14];
+
+	dp[0] = Some(Vec::new());
+	for mask in 0..big_num {
+		if let Some(cur_hand) = dp[mask].clone() {
+			for submask in 1..big_num {
+				if (mask & submask) != 0 {
+					continue;
+				}
+				if submask.count_ones() < 3 {
+					continue;
+				}
+				let subset_len = (0..14).filter(|&i| (submask >> i) & 1 == 1).fold(0, |acc, i| {
+					subset[acc] = tiles[i];
+					acc + 1
+				});
+				let slice = &subset[..subset_len];
+
+				let mut new_hands = cur_hand.clone();
+				let good = if is_set_fast(slice) {
+					new_hands.push(HandType::Set(slice.to_vec()));
+					true
+				} else if is_run_fast(slice) {
+					new_hands.push(HandType::Run(slice.to_vec()));
+					true
+				} else {
+					false
+				};
+				if good {
+					dp[mask | submask] = Some(new_hands);
+					if mask | submask == big_num - 1 {
+						return dp[mask | submask].clone();
+					}
+				}
+			}
+		}
+	}
+
+	dp[big_num - 1].clone()
 }

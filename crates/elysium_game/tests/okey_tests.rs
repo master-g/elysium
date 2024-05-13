@@ -299,4 +299,19 @@ mod tests {
 			}
 		}
 	}
+
+	#[test]
+	fn test_okey_win_arrange() {
+		let mut rng = rand::thread_rng();
+		let mut vec = okey_tiles_from_str("j j b7 b7 k8 k8 r1 r1 r2 r2 y11 y11 k13 k13");
+		vec.shuffle(&mut rng);
+
+		// let result = okey_arrange_win(&vec);
+		// println!("Result: {:?}", result);
+
+		let mut vec = okey_tiles_from_str("y6 y7 y8 r5 b5 j k5 r8 b8 k8 r13 b13 k13 y13");
+		vec.shuffle(&mut rng);
+		let result = okey_arrange_win(&vec);
+		println!("Result: {:?}", result);
+	}
 }

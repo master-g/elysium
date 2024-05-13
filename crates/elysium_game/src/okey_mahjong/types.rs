@@ -244,3 +244,10 @@ impl Display for Tile {
 		f.write_str(&format!("{}{}", color, value))
 	}
 }
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub enum HandType {
+	Pair(Tile),
+	Run(Vec<Tile>),
+	Set(Vec<Tile>),
+}
