@@ -1,5 +1,4 @@
 mod foo;
-mod okey;
 mod version;
 
 use std::process::ExitCode;
@@ -74,7 +73,6 @@ pub async fn init() -> ExitCode {
 
 	let output = match args.command {
 		Some(Commands::Foo(args)) => foo::init(args).await,
-		Some(Commands::Okey) => okey::init().await,
 		_ => Ok(()),
 	};
 

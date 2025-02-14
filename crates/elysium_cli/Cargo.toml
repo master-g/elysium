@@ -8,17 +8,17 @@ name = "elysium"
 
 [dependencies]
 elysium_core = { path = "../elysium_core" }
-elysium_game = { path = "../elysium_game" }
+# elysium_game = { path = "../elysium_game" }
 
 rand = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
 clap = { version = "4.5.4", features = [
-	"derive",
-	"env",
-	"wrap_help",
-	"unicode",
+  "derive",
+  "env",
+  "wrap_help",
+  "unicode",
 ] }
 tracing = "0.1.40"
 tracing-appender = "0.2.3"

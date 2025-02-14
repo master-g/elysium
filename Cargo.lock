@@ -317,7 +317,6 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "elysium_core",
- "elysium_game",
  "jemallocator",
  "mimalloc",
  "rand",
@@ -335,18 +334,6 @@ name = "elysium_core"
 version = "0.1.0"
 dependencies = [
  "once_cell",
- "tracing",
-]
-
-[[package]]
-name = "elysium_game"
-version = "0.1.0"
-dependencies = [
- "criterion",
- "env_logger",
- "rand",
- "serde",
- "test-log",
  "tracing",
 ]
 
