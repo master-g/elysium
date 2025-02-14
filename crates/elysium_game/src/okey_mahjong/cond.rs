@@ -13,6 +13,11 @@ pub fn okey_is_seven_pairs(tiles: &[Tile]) -> bool {
 	let mut pair_count = 0;
 	let mut jokers = counts[Tile::Joker.value_without_bits()];
 
+	if jokers == 2 {
+		// two jokers cannot be used as pairs
+		return false;
+	}
+
 	for count in counts.iter().take(255) {
 		match *count {
 			0 => continue,

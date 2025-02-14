@@ -1,0 +1,23 @@
+[package]
+name = "elysium_buckshot"
+version = "0.1.0"
+edition = "2021"
+license-file = "../../LICENSE"
+resolver = "2"
+
+[dependencies]
+rand = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+tracing = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"] }
+env_logger = { workspace = true }
+test-log = { workspace = true, features = ["trace"] }
+
+[lib]
+name = "elysium_buckshot"
+
+[[bench]]
+name = "bench"
+harness = false

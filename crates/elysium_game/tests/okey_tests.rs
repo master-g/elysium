@@ -7,7 +7,7 @@ mod tests {
 
 	#[test]
 	fn test_okey_is_seven_pairs() {
-		assert!(okey_is_seven_pairs(&[
+		assert!(!okey_is_seven_pairs(&[
 			Tile::Yellow01,
 			Tile::Yellow01,
 			Tile::Yellow02,
@@ -55,7 +55,7 @@ mod tests {
 			Tile::Yellow07,
 			Tile::Joker,
 		]));
-		assert!(okey_is_seven_pairs(&[
+		assert!(!okey_is_seven_pairs(&[
 			Tile::Yellow01,
 			Tile::Yellow01,
 			Tile::Yellow02,
