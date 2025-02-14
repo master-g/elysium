@@ -8,13 +8,13 @@ name = "elysium"
 
 [dependencies]
 elysium_core = { path = "../elysium_core" }
-# elysium_game = { path = "../elysium_game" }
+elysium_buckshot = { path = "../elysium_buckshot" }
 
 rand = { workspace = true }
 thiserror = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
 
-clap = { version = "4.5.4", features = [
+clap = { version = "4.5.29", features = [
   "derive",
   "env",
   "wrap_help",
@@ -23,13 +23,13 @@ clap = { version = "4.5.4", features = [
 tracing = "0.1.40"
 tracing-appender = "0.2.3"
 tracing-log = "0.2.0"
-tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-subscriber = { version = "0.3.19", features = ["env-filter"] }
 
 [target.'cfg(any(target_os = "linux", target_os = "macos", target_os = "ios"))'.dependencies]
-mimalloc = { version = "0.1.41", default-features = false }
+mimalloc = { version = "0.1.43", default-features = false }
 
 [target.'cfg(any(target_os = "android", target_os = "freebsd", target_os = "netbsd", target_os = "openbsd"))'.dependencies]
 jemallocator = "0.5.4"
 
 [build-dependencies]
-semver = "1.0.22"
+semver = "1.0.25"
